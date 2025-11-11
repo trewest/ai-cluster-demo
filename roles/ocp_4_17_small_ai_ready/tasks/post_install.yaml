@@ -1,0 +1,23 @@
+---
+- name: Install Operators
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('kubernetes.core.kustomize', dir = kustomize_dir ~ '/operators') }}"
+    validate_certs: false
+
+- name: Wait for operators to be ready
+  kubernetes.core.k8s_info:
+    namespace: "{{ operator }}"
+    kind: Pod
+    wait: true
+    wait_timeout: 600
+    wait_condition:
+      type: Ready
+      status: 'True'
+  loop_control:
+    loop_var: operator
+  loop:
+    - nvidia-gpu-operator
+    - nvidia-network-operator
+    - openshift-sriov-network-operator
+    - openshift-nfd

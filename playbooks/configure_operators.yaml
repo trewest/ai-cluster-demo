@@ -1,0 +1,7 @@
+---
+- name: Configure AI operators
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - ocp_4_17_small_ai_ready
