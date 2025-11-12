@@ -9,3 +9,6 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   installPlanApproval: Automatic
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
