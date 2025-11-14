@@ -1,0 +1,60 @@
+apiVersion: mellanox.com/v1alpha1
+kind: NicClusterPolicy
+metadata:
+  name: nic-cluster-policy
+spec:
+  ofedDriver:
+    imagePullSecrets: []
+    readinessProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 30
+    forcePrecompiled: false
+    terminationGracePeriodSeconds: 300
+    repository: nvcr.io/nvidia/mellanox
+    livenessProbe:
+      initialDelaySeconds: 30
+      periodSeconds: 30
+    upgradePolicy:
+      autoUpgrade: true
+      drain:
+        deleteEmptyDir: true
+        enable: true
+        force: true
+        podSelector: ''
+        timeoutSeconds: 300
+      maxParallelUpgrades: 1
+      safeLoad: false
+    startupProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 20
+    version: doca3.1.0-25.07-0.9.7.0-0
+    image: doca-driver
+    env:
+    - name: UNLOAD_STORAGE_MODULES
+      value: "true"
+    - name: RESTORE_DRIVER_ON_POD_TERMINATION
+      value: "true"
+    - name: CREATE_IFNAMES_UDEV
+      value: "true"
+    - name: ENABLE_NFSRDMA
+      value: 'true'
+    - name: ENTRYPOINT_DEBUG
+      value: 'true'
+
+  rdmaSharedDevicePlugin:
+    config: |
+      {
+        "configList": [
+          {
+            "resourceName": "rdma_shared_device_eth",
+            "rdmaHcaMax": 63,
+            "selectors": {
+               "ifNames": ["eno8np0"]
+            }
+          }
+        ]
+      }
+    image: k8s-rdma-shared-dev-plugin
+    imagePullSecrets: []
+    repository: nvcr.io/nvidia/mellanox
+    version: 'sha256:a87096761d155eeb6f470e042d2d167bb466d57e63b4aba957f57d745e15a9b2'

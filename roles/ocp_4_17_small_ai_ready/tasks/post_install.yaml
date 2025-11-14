@@ -7,7 +7,7 @@
 
 - name: Wait for operators to be ready
   kubernetes.core.k8s_info:
-    namespace: "{{ operator }}"
+    namespace: "{{ operator_namespace }}"
     kind: Pod
     wait: true
     wait_timeout: 600
@@ -15,9 +15,30 @@
       type: Ready
       status: 'True'
   loop_control:
-    loop_var: operator
+    loop_var: operator_namespace
   loop:
     - nvidia-gpu-operator
     - nvidia-network-operator
-    - openshift-sriov-network-operator
     - openshift-nfd
+
+- name: Apply cluster configuration
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('kubernetes.core.kustomize', dir = kustomize_dir ~ '/config') }}"
+    validate_certs: false
+
+- name: Wait for pods to be ready
+  kubernetes.core.k8s_info:
+    namespace: "{{ operator_namespace }}"
+    kind: Pod
+    wait: true
+    wait_timeout: 600
+    wait_condition:
+      type: Ready
+      status: 'True'
+  loop_control:
+    loop_var: operator_namespace
+  loop:
+    - openshift-nfd
+    - nvidia-gpu-operator
+    - nvidia-network-operator
