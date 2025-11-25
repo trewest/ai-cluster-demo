@@ -1,1 +1,6 @@
 kustomize_dir: "{{role_path}}/../../files"
+helm_charts_dir: "{{role_path}}/../../files/charts"
+bcm_agent_image_repo: ghcr.io/fabiendupont/nvidia-bcm-lite-daemon
+bcm_agent_image_tag: latest
+bcm_agent_port: 8081
+bcm_agent_secret_name: bcm-bootstrap-cert
